@@ -187,7 +187,7 @@ public class MutationEngine: ComponentBase, FuzzEngine {
             case .failed:
                 mutator.producedInvalidSample()
                 if fuzzer.config.diagnostics {
-                    program = appendComment("Stdout:\n" + execution.stdout, to: program)
+                    program = appendComment(mutator.name + "\nStdout:\n" + execution.stdout, to: program)
                 }
                 fuzzer.dispatchEvent(fuzzer.events.InvalidProgramFound, data: program)
                 

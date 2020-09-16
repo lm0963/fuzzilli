@@ -4,6 +4,8 @@ Package.resolved
 /Packages
 /*.xcodeproj
 .vscode
+/swift
+/crash
 
 # custom GCE configuration
 Cloud/GCE/config.sh

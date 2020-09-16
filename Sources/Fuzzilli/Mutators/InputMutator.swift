@@ -27,8 +27,16 @@ public class InputMutator: BaseInstructionMutator {
         
         // Replace one input
         let selectedInput = Int.random(in: 0..<instr.numInputs)
-        inouts[selectedInput] = b.randVar()
-                
+        let type = b.type(of: inouts[selectedInput])
+        var replace: Variable?
+        if probability(0.8) {
+            replace = b.randVar(ofConservativeType: type)
+        } else {
+            replace = b.randVar()
+        }
+        if replace != nil {
+            inouts[selectedInput] = replace!
+        }
         b.append(Instruction(instr.op, inouts: inouts))
     }
 }
