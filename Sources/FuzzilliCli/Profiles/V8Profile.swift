@@ -25,6 +25,42 @@ fileprivate let ForceV8TurbofanGenerator = CodeGenerator("ForceV8TurbofanGenerat
     }
 }
 
+fileprivate let AimForTypeConfusion = CodeGenerator("AimForTypeConfusion") { b in
+    func funcbody(_ vars: [Variable])
+    {
+        b.generate(n: 5)
+        
+        let code = b.codeString() {
+            b.generateRecursive()
+            return b.randVar()
+        }
+        let eval = b.loadBuiltin("eval")
+        b.callFunction(eval, withArgs: [code])
+
+        let array = b.randVar(ofType: .object())! // maybe .jsArray?
+        let index = b.genIndex()
+        b.loadElement(index, of: array)
+        b.doReturn(value: b.randVar())
+    }
+    let f = withEqualProbability({
+        b.definePlainFunction(withSignature: FunctionSignature(withParameterCount: Int.random(in: 2...5), hasRestParam: probability(0.4)), funcbody)
+    },{
+        b.defineStrictFunction(withSignature: FunctionSignature(withParameterCount: Int.random(in: 2...5), hasRestParam: probability(0.4)), funcbody)
+    })
+    let initialArgs = b.generateCallArguments(for: f)!
+    let optimisationArgs = b.generateCallArguments(for: f)!
+    let triggeredArgs = b.generateCallArguments(for: f)!
+
+    b.callFunction(f, withArgs: initialArgs)
+
+    // Ensure optimisation - watch out with timeouts! 
+    b.forLoop(b.loadInt(0), .lessThan, b.loadInt(Int64.random(in: 100 ... 20000)), .Add, b.loadInt(1)) { _ in
+        b.callFunction(f, withArgs: optimisationArgs)
+     }
+
+    b.callFunction(f, withArgs: triggeredArgs)
+}
+
 let v8Profile = Profile(
     processArguments: ["--debug-code",
                        "--expose-gc",
@@ -54,6 +90,7 @@ let v8Profile = Profile(
     
     additionalCodeGenerators: WeightedList<CodeGenerator>([
         (ForceV8TurbofanGenerator, 10),
+        (AimForTypeConfusion, 20)
     ]),
        
     disabledCodeGenerators: [],
