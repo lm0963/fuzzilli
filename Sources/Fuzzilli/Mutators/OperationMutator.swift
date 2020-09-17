@@ -62,10 +62,9 @@ public class OperationMutator: BaseInstructionMutator {
             }
             newOp = CreateArrayWithSpread(numInitialValues: spreads.count, spreads: spreads)
         case let op as LoadBuiltin:
-            var oldName = op.builtinName
-            var newName = b.genBuiltinName(ofType: b.fuzzer.environment.type(ofBuiltin: oldName))
-            if newName == nil { newName = oldName }
-            newOp = LoadBuiltin(builtinName: newName!)
+            let oldName = op.builtinName
+            let newName = b.genBuiltinName(ofType: b.fuzzer.environment.type(ofBuiltin: oldName))
+            newOp = LoadBuiltin(builtinName: newName)
         case is LoadProperty:
             newOp = LoadProperty(propertyName: b.genPropertyNameForRead())
         case is StoreProperty:

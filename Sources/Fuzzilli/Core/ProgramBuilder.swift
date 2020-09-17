@@ -181,7 +181,7 @@ public class ProgramBuilder {
     ///
     /// In conservative mode, this function fails unless it finds a matching variable.
     /// In aggressive mode, this function will return builtin name of any type, if no matching builtin names are available.
-    public func genBuiltinName(ofType type: Type) -> String? {
+    public func genBuiltinName(ofType type: Type) -> String {
         var builtins = [String]()
         for name in fuzzer.environment.builtins {
             if fuzzer.environment.type(ofBuiltin: name).baseType == type.baseType {
@@ -189,15 +189,7 @@ public class ProgramBuilder {
             }
         }
         
-        if !builtins.isEmpty {
-            return chooseUniform(from: builtins)
-        }
-
-        if mode == .aggressive {
-            return chooseUniform(from: fuzzer.environment.builtins)
-        }
-
-        return nil
+        return chooseUniform(from: builtins)
     }
     
     /// Generates a random property name for the current program context.
