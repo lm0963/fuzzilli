@@ -557,6 +557,24 @@ public let CodeGenerators: [CodeGenerator] = [
             b.generateRecursive()
         }
     },
+
+    CodeGenerator("CallArgFuncGenerator") { b in
+        guard let fa = b.randVar(ofConservativeType: .function()) else { return }
+        guard let arguments = b.generateCallArguments(for: fa) else { return }
+
+        func funcbody(_ farg: [Variable])
+        {
+            b.callFunction(farg[0], withArgs: arguments)
+        }
+
+        let f = withEqualProbability({
+            b.definePlainFunction(withSignature: FunctionSignature(withParameterCount: 1), funcbody)
+        },{
+            b.defineStrictFunction(withSignature: FunctionSignature(withParameterCount: 1), funcbody)
+        })
+
+        b.callFunction(f, withArgs: [fa])
+    },
 ]
 
 extension Array where Element == CodeGenerator {
